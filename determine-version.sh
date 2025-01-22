@@ -51,12 +51,12 @@ fi
 
 declare -r GIVEN_VERSION="$(node --eval "console.log(require('${MANIFEST_FILE_PATH}').version)")"
 
-#echo GIVEN_VESION: "$GIVEN_VERSION"
+#echo GIVEN_VERSION: "$GIVEN_VERSION"
 
 #echo MAJOR: "$MAJOR"
 #echo MINOR: "$MINOR"
 #echo PATCH: "$PATCH"
-#echo CANDIATE: "$CANDIDATE"
+#echo CANDIDATE: "$CANDIDATE"
 
 #echo TYPE: "$UPDATE_TYPE"
 

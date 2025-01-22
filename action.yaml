@@ -18,13 +18,19 @@ runs:
   using: composite
 
   steps:
+    - name: Checkout actions repository.
+      uses: actions/checkout@v4.2.2
+      with:
+        repository: thaibault/build-package-and-push
+        path: ../build-package-and-push-action
+
     - uses: thaibault/install-npm-package-dependencies-action@main
       with:
         debug: ${{ inputs.debug }}
 
     - name: Update package.json mentioned version.
       id: version
-      run: echo "new=$(bash ./determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" >> "$GITHUB_OUTPUT"
+      run: echo "new=$(bash ../build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: print
