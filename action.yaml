@@ -22,7 +22,7 @@ runs:
       uses: actions/checkout@v4.2.2
       with:
         repository: thaibault/build-package-and-push
-        path: ../build-package-and-push-action
+        path: .git/build-package-and-push-action
 
     - uses: thaibault/install-npm-package-dependencies-action@main
       with:
@@ -30,7 +30,7 @@ runs:
 
     - name: Update package.json mentioned version.
       id: version
-      run: echo "new=$(bash ../build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" >> "$GITHUB_OUTPUT"
+      run: echo "new=$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: print
