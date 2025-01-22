@@ -23,11 +23,12 @@ runs:
         debug: ${{ inputs.debug }}
 
     - name: Update package.json mentioned version.
-      run: echo "NEW_VESION=$(./determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}}" >> "$GITHUB_OUTPUT"
+      id: version
+      run: echo "new=$(./determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: print
-      run: echo '${{outputs.NEW_VERSION}}'
+      run: echo '${{steps.version.new}}'
       shell: bash
 
     #- name: Create git tag for newly create package version.
