@@ -23,18 +23,22 @@ runs:
         debug: ${{ inputs.debug }}
 
     - name: Update package.json mentioned version.
-      run: ./determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}}
+      run: echo "NEW_VESION=$(./determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}}" >> "$GITHUB_OUTPUT"
       shell: bash
 
-    - name: Create git tag for newly create package version.
-      run: git tag ""
+    - name: print
+      run: echo '${{outputs.NEW_VERSION}}'
       shell: bash
 
-    - name: Update artefacts in git repository.
-      run: git commit --all --message 'Publish new version.' && git push --tags && git push
-      shell: bash
+    #- name: Create git tag for newly create package version.
+      #run: git tag "${{outputs.NEW_VERSION}}"
+      #shell: bash
 
-    - name: Publish newly created package.
-      env:
-        NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-      run: yarn publish
+    #- name: Update artefacts in git repository.
+      #run: git commit --all --message 'Publish new version ${{outputs.NEW_VERSION}}.' && git push --tags && git push
+      #shell: bash
+
+    #- name: Publish newly created package.
+      #env:
+      #  NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
+      #run: yarn publish
