@@ -10,9 +10,8 @@
 # 3.0 unported license. see http://creativecommons.org/licenses/by/3.0/deed.de
 # endregion
 # shellcheck disable=SC1090,SC2034,SC2155
-declare -r MANIFEST_FILE_PATH='../clientnode/package.json'
+declare -r MANIFEST_FILE_PATH='./package.json'
 declare -r VERSION_PATTERN='^([^.]+)\.([^.]+)\.([^.]+)(.+)?$'
-declare -r GIVEN_VERSION="$(node --eval "console.log(require('${MANIFEST_FILE_PATH}').version)")"
 
 declare FORMAT='${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
 
@@ -44,6 +43,13 @@ while true; do
             exit 1
     esac
 done
+
+if [ ! -s "${MANIFEST_FILE_PATH}" ]; then
+    echo "Given file \"${MANIFEST_FILE_PATH}\" does not exist or is empty."
+    exit 1
+fi
+
+declare -r GIVEN_VERSION="$(node --eval "console.log(require('${MANIFEST_FILE_PATH}').version)")"
 
 #echo GIVEN_VESION: "$GIVEN_VERSION"
 
