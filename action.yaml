@@ -19,24 +19,22 @@ runs:
 
   steps:
     - uses: thaibault/install-npm-package-dependencies-action@main
-       with:
-         debug: ${{ inputs.debug }}
+      with:
+        debug: ${{ inputs.debug }}
 
     - name: Update package.json mentioned version.
-        env:
-          NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-        run: yarn version ${{ inputs.type || 'patch' }}
-        shell: bash
+      run: ./determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}}
+      shell: bash
 
-      - name: Create git tag for newly create package version.
-        run: ls -lha && git tag "v$(node --eval 'console.log(require("./package.json").version)')"
-        shell: bash
+    - name: Create git tag for newly create package version.
+      run: git tag ""
+      shell: bash
 
-      - name: Update artefacts in git repository.
-        run: git commit --all --message 'Publish new version.' && git push --tags && git push
-        shell: bash
+    - name: Update artefacts in git repository.
+      run: git commit --all --message 'Publish new version.' && git push --tags && git push
+      shell: bash
 
-      - name: Publish newly created package.
-        env:
-          NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-        run: yarn publish
+    - name: Publish newly created package.
+      env:
+        NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
+      run: yarn publish
