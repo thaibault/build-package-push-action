@@ -18,15 +18,13 @@ runs:
   using: composite
 
   steps:
-    - name: Checkout actions repository.
-      uses: actions/checkout@v4.2.2
-      with:
-        repository: thaibault/build-package-and-push
-        path: .git/build-package-and-push-action
-
     - uses: thaibault/install-npm-package-dependencies-action@main
       with:
         debug: ${{ inputs.debug }}
+
+    - name: Get determining script.
+      run: mkdir --parents .git/build-package-and-push-action && curl --output '.git/build-package-and-push-action/determine-version-sh' 'https://raw.githubusercontent.com/thaibault/build-package-push-action/refs/heads/main/determine-version.sh'
+      shell: bash
 
     - name: Update package.json mentioned version.
       id: version
