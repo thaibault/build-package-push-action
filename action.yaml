@@ -34,7 +34,7 @@ runs:
       id: version
       # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
       # exit code.
-      run: echo AA "$(echo jau)"
+      run: echo "new=$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}' ${{inputs.type || 'patch'}})" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: print
