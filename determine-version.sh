@@ -10,7 +10,7 @@
 # 3.0 unported license. see http://creativecommons.org/licenses/by/3.0/deed.de
 # endregion
 # shellcheck disable=SC1090,SC2034,SC2155
-declare -r MANIFEST_FILE_PATH='../../package.json'
+declare -r MANIFEST_FILE_PATH='./package.json'
 declare -r VERSION_PATTERN='^([^.]+)\.([^.]+)\.([^.]+)(.+)?$'
 
 declare FORMAT='${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
@@ -63,14 +63,14 @@ declare -r GIVEN_VERSION="$(
     node --eval "console.log(require('${MANIFEST_FILE_PATH}').version)"
 )"
 
-#echo GIVEN_VERSION: "$GIVEN_VERSION"
+echo GIVEN_VERSION: "$GIVEN_VERSION"
 
-#echo MAJOR: "$MAJOR"
-#echo MINOR: "$MINOR"
-#echo PATCH: "$PATCH"
-#echo CANDIDATE: "$CANDIDATE"
+echo MAJOR: "$MAJOR"
+echo MINOR: "$MINOR"
+echo PATCH: "$PATCH"
+echo CANDIDATE: "$CANDIDATE"
 
-#echo TYPE: "$UPDATE_TYPE"
+echo TYPE: "$UPDATE_TYPE"
 
 if [ "$UPDATE_TYPE" = major ]; then
     (( MAJOR += 1))
