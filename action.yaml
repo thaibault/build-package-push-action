@@ -34,7 +34,7 @@ runs:
       id: version
       # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
       # exit code.
-      run: AA "$(echo jau)" \
+      run: echo AA "$(echo jau)"
       shell: bash
 
     - name: print
