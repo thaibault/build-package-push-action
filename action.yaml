@@ -44,14 +44,15 @@ runs:
       shell: bash
 
     - name: Create git tag for newly create version.
-      run: git tag "${{steps.version.outputs.new}}"
+      run: git tag "${{ steps.version.outputs.new }}"
       shell: bash
 
     - name: Update artefacts in git repository.
-      run: git commit --all --message 'Publish new version ${{steps.version.outputs.new}}.' && git push --tags && git push
+      run: git commit --all --message 'Publish new version ${{ steps.version.outputs.new }}.' && git push --tags && git push
       shell: bash
 
     - name: Publish newly created package.
       env:
         NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
       run: yarn publish
+      shell: bash
