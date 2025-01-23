@@ -45,7 +45,7 @@ runs:
       shell: bash
 
     - name: print
-      run: echo Newly determined version is \"${{steps.version.outputs.new}}\".
+      run: echo Newly determined version is \"${{ steps.version.outputs.new }}\".
       shell: bash
 
     #- uses: EndBug/add-and-commit@v9
