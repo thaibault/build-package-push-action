@@ -58,6 +58,12 @@ runs:
     - name: Print user
       run: echo $USER
       shell: bash
+    - name: Print
+      run: echo $HOME
+      shell: bash
+    - name: Print
+      run: cd && pwd
+      shell: bash
     - name: Print users
       run: cat /etc/passwd
       shell: bash
