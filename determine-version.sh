@@ -45,11 +45,15 @@ while true; do
 done
 
 if [ ! -s "${MANIFEST_FILE_PATH}" ]; then
-    echo "Given file \"${MANIFEST_FILE_PATH}\" does not exist or is empty."
+    echo \
+        "Given file \"${MANIFEST_FILE_PATH}\" does not exist or is empty." \
+        &>/dev/stderr
     exit 1
 fi
 
-declare -r GIVEN_VERSION="$(node --eval "console.log(require('${MANIFEST_FILE_PATH}').version)")"
+declare -r GIVEN_VERSION="$(
+    node --eval "console.log(require('${MANIFEST_FILE_PATH}').version)"
+)"
 
 #echo GIVEN_VERSION: "$GIVEN_VERSION"
 
