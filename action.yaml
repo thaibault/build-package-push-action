@@ -53,17 +53,17 @@ runs:
       shell: bash
 
     - name: Print users
-      run: echo ${{ github.workspace }}
+      run: echo ${{ github.workspace }} JAUJAU $GITHUB_WORKSPACE
       shell: bash
     - name: JAU
       run: git config --global --add safe.directory /__w/clientnode/clientnode
       shell: bash
 
 
-    - uses: EndBug/add-and-commit@v9
-      with:
-        tag: ${{ steps.version.outputs.new }}
-        message: Publish new version "${{ steps.version.outputs.new }}".
+    #- uses: EndBug/add-and-commit@v9
+    #  with:
+    #    tag: ${{ steps.version.outputs.new }}
+    #    message: Publish new version "${{ steps.version.outputs.new }}".
 
     #- name: Publish newly created package.
     #  env:
