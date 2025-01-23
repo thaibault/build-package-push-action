@@ -71,6 +71,7 @@ runs:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
       run: npm publish
+      shell: bash
 
     #- uses: actions/setup-node@v4
     #  with:
