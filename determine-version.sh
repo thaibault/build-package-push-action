@@ -10,15 +10,23 @@
 # 3.0 unported license. see http://creativecommons.org/licenses/by/3.0/deed.de
 # endregion
 # shellcheck disable=SC1090,SC2034,SC2155
-declare -r MANIFEST_FILE_PATH='./package.json'
+declare -r MANIFEST_FILE_PATH='../../package.json'
 declare -r VERSION_PATTERN='^([^.]+)\.([^.]+)\.([^.]+)(.+)?$'
 
 declare FORMAT='${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
 
-declare MAJOR="$(echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\1/")"
-declare MINOR="$(echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\2/")"
-declare PATCH="$(echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\3/")"
-declare CANDIDATE="$(echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\4/")"
+declare MAJOR="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\1/"
+)"
+declare MINOR="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\2/"
+)"
+declare PATCH="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\3/"
+)"
+declare CANDIDATE="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\4/"
+)"
 
 declare UPDATE_TYPE=patch
 
