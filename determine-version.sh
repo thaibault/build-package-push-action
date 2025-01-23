@@ -13,9 +13,11 @@
 declare -r MANIFEST_FILE_PATH='./package.json'
 declare -r VERSION_PATTERN='^([^.]+)\.([^.]+)\.([^.]+)(.+)?$'
 
-declare FORMAT='${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
+declare MANIFEST_FORMAT='${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
+declare FORMAT="$MANIFEST_FORMAT"
 declare UPDATE_TYPE=patch
 declare DEBUG=false
+declare UPDATE_MANIFEST_FILE=false
 
 while true; do
     case "$1" in
@@ -26,6 +28,10 @@ while true; do
         -f|--format)
             shift
             FORMAT="$1"
+            shift
+            ;;
+        -u|--update-manifest-file)
+            UPDATE_MANIFEST_FILE=true
             shift
             ;;
         major|minor|patch)
@@ -84,6 +90,11 @@ elif [ "$UPDATE_TYPE" = minor ]; then
     (( MINOR += 1))
 elif [ "$UPDATE_TYPE" = patch ]; then
     (( PATCH += 1))
+fi
+
+if $UPDATE_MANIFEST_FILE; then
+    declare -r NEW_MANIFEST_VERSION="$(eval "echo \"${MANIFEST_FORMAT}\"")"
+    node --eval "const {writeFileSync} = require('fs'); const content = require('${MANIFEST_FILE_PATH}'); content.version = '${NEW_MANIFEST_VERSION}'; writeFileSync('${MANIFEST_FILE_PATH}', JSON.stringify(content), {encoding: 'utf-8'})"
 fi
 
 declare -r NEW_VERSION="$(eval "echo \"${FORMAT}\"")"
