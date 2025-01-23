@@ -22,13 +22,19 @@ runs:
       with:
         debug: ${{ inputs.debug }}
 
-    - name: Get determining script.
-      run: mkdir --parents .git/build-package-and-push-action && curl --output '.git/build-package-and-push-action/determine-version-sh' 'https://raw.githubusercontent.com/thaibault/build-package-push-action/refs/heads/main/determine-version.sh'
+    - name: Get the version determining script.
+      run: |
+        mkdir --parents .git/build-package-and-push-action && \
+        curl \
+          --output '.git/build-package-and-push-action/determine-version.sh' \
+          'https://raw.githubusercontent.com/thaibault/build-package-push-action/refs/heads/main/determine-version.sh'
       shell: bash
 
     - name: Update package.json mentioned version.
       id: version
-      run: echo "new=$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" >> "$GITHUB_OUTPUT"
+      run: |
+        echo "new=$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" \
+        >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: print
