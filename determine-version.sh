@@ -14,20 +14,6 @@ declare -r MANIFEST_FILE_PATH='./package.json'
 declare -r VERSION_PATTERN='^([^.]+)\.([^.]+)\.([^.]+)(.+)?$'
 
 declare FORMAT='${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
-
-declare MAJOR="$(
-    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\1/"
-)"
-declare MINOR="$(
-    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\2/"
-)"
-declare PATCH="$(
-    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\3/"
-)"
-declare CANDIDATE="$(
-    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\4/"
-)"
-
 declare UPDATE_TYPE=patch
 
 while true; do
@@ -61,6 +47,19 @@ fi
 
 declare -r GIVEN_VERSION="$(
     node --eval "console.log(require('${MANIFEST_FILE_PATH}').version)"
+)"
+
+declare MAJOR="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\1/"
+)"
+declare MINOR="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\2/"
+)"
+declare PATCH="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\3/"
+)"
+declare CANDIDATE="$(
+    echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\4/"
 )"
 
 echo GIVEN_VERSION: "$GIVEN_VERSION"
