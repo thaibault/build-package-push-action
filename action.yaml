@@ -35,10 +35,9 @@ runs:
       # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
       # exit code.
       run: |
-        declare NEW_VERSION \
         NEW_VERSION="$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" \
         echo Determined new version \"${NEW_VERSION}\". \
-        echo "new=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+        echo "new=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: print
