@@ -35,7 +35,7 @@ runs:
       run: |
         declare NEW_VERSION \
         NEW_VERSION="$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATH}${CANDIDATE}' ${{inputs.type || 'patch'}})" \
-        test $? != 0 && exit 1 \
+        [[ $? != 0 ]] && exit 1 \
         echo Determined new version \"${NEW_VERSION}\". \
         echo "new=$NEW_VERSION" >> "$GITHUB_OUTPUT"
       shell: bash
