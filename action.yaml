@@ -55,6 +55,14 @@ runs:
     - name: Analyze dir.
       run: ls -lha
       shell: bash
+    - name: Print user
+      run: echo $USER
+      shell: bash
+    - name: Print users
+      run: cat /etc/passwd
+      shell: bash
+
+
 
     - uses: EndBug/add-and-commit@v9
       with:
