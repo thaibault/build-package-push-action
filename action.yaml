@@ -22,6 +22,12 @@ runs:
       with:
         debug: ${{ inputs.debug }}
 
+    - name: DEBUG
+      # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
+      # exit code.
+      run: ls -lha ${{ github.action_path }}
+      shell: bash
+
     - name: Update package.json mentioned version.
       id: version
       # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
