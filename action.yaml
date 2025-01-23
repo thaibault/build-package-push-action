@@ -35,6 +35,7 @@ runs:
       # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
       # exit code.
       run: |
+        echo A B C \
         echo AA "$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}' ${{inputs.type || 'patch'}})" \
         echo \
         echo \
