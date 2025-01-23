@@ -36,8 +36,12 @@ runs:
       # exit code.
       run: |
         bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
+        echo \
+        echo \
         NEW_VERSION="$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}' ${{inputs.type || 'patch'}})" \
         echo Determined new version \"${NEW_VERSION}\". \
+        echo \
+        echo \
         echo "new=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
       shell: bash
 
