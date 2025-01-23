@@ -5,6 +5,10 @@ inputs:
     description: Sets "NODE_ENV" to "debug".
     required: false
     default: false
+  npm-token:
+    description: List of build-time variables.
+    required: true
+
   type:
     description: Sets semantic version update type.
     default: patch
@@ -68,7 +72,7 @@ runs:
         registry-url: 'https://registry.npmjs.org'
     - name: Publish newly created package.
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
         NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
       run: npm publish
       shell: bash
