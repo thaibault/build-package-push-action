@@ -18,15 +18,15 @@ runs:
   using: composite
 
   steps:
-    - uses: thaibault/install-npm-package-dependencies-action@main
-      with:
-        debug: ${{ inputs.debug }}
-
     - name: DEBUG
       # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
       # exit code.
       run: ls -lha ${{ github.action_path }}
       shell: bash
+
+    - uses: thaibault/install-npm-package-dependencies-action@main
+      with:
+        debug: ${{ inputs.debug }}
 
     - name: Update package.json mentioned version.
       id: version
