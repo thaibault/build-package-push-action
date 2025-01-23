@@ -41,8 +41,6 @@ runs:
 
     - name: Update package.json mentioned version.
       id: version
-      # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
-      # exit code.
       run: |
         echo "new=$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}' --update-manifest-file ${{inputs.type || 'patch'}})" \
         >> "$GITHUB_OUTPUT"
@@ -60,10 +58,10 @@ runs:
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       shell: bash
 
-    #- uses: EndBug/add-and-commit@v9
-    #  with:
-    #    tag: ${{ steps.version.outputs.new }}
-    #    message: Publish new version "${{ steps.version.outputs.new }}".
+    - uses: EndBug/add-and-commit@v9
+      with:
+        tag: ${{ steps.version.outputs.new }}
+        message: Publish new version "${{ steps.version.outputs.new }}".
 
     # Setup .npmrc file to publish to npm
     - uses: actions/setup-node@v4
@@ -77,12 +75,12 @@ runs:
       run: npm publish
       shell: bash
 
-    #- uses: actions/setup-node@v4
-    #  with:
-    #    node-version: '20.x'
-    #    registry-url: 'https://npm.pkg.github.com'
-    #    # Defaults to the user or organization that owns the workflow file
-    #    scope: '@octocat'
-    #- run: npm publish
-    #  env:
-    #    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/setup-node@v4
+      with:
+        node-version: latest
+        registry-url: 'https://npm.pkg.github.com'
+        # Defaults to the user or organization that owns the workflow file.
+        scope: '@octocat'
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
