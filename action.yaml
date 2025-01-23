@@ -52,17 +52,8 @@ runs:
       run: echo Newly determined version is \"${{ steps.version.outputs.new }}\".
       shell: bash
 
-    - name: Analyze dir.
-      run: ls -lha
-      shell: bash
-    - name: Print user
-      run: echo $USER
-      shell: bash
-    - name: Print
-      run: cd && pwd && ls -lha
-      shell: bash
     - name: Print users
-      run: cat /etc/passwd
+      run: echo ${{ github.workspace }}
       shell: bash
     - name: JAU
       run: git config --global --add safe.directory /__w/clientnode/clientnode
@@ -72,7 +63,7 @@ runs:
     - uses: EndBug/add-and-commit@v9
       with:
         tag: ${{ steps.version.outputs.new }}
-        message: Publish new version \"${{ steps.version.outputs.new }}\".
+        message: Publish new version "${{ steps.version.outputs.new }}".
 
     #- name: Publish newly created package.
     #  env:
