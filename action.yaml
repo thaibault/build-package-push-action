@@ -18,22 +18,24 @@ runs:
   using: composite
 
   steps:
-    - name: DEBUG
-      # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
-      # exit code.
-      run: ls -lha ${{ github.action_path }}
-      shell: bash
-
     - uses: thaibault/install-npm-package-dependencies-action@main
       with:
         debug: ${{ inputs.debug }}
+
+    - name: Get the version determining script.
+      run: |
+        mkdir --parents .git/build-package-and-push-action && \
+        curl \
+          --output '.git/build-package-and-push-action/determine-version.sh' \
+          'https://raw.githubusercontent.com/thaibault/build-package-push-action/refs/heads/main/determine-version.sh'
+      shell: bash
 
     - name: Update package.json mentioned version.
       id: version
       # NOTE: Declare variable beforehand to avoid shadowing the nested shell's
       # exit code.
       run: |
-        echo "new=$(bash ${{ github.action_path }}/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}' ${{inputs.type || 'patch'}})" \
+        echo "new=$(bash .git/build-package-and-push-action/determine-version.sh --format 'v${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}' ${{inputs.type || 'patch'}})" \
         >> "$GITHUB_OUTPUT"
       shell: bash
 
