@@ -24,7 +24,7 @@ declare UPDATE_TYPE=patch
 
 while true; do
     case "$1" in
-        -f|format)
+        -f|--format)
             shift
             FORMAT="$1"
             shift
