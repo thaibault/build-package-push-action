@@ -52,21 +52,33 @@ runs:
       run: echo Newly determined version is \"${{ steps.version.outputs.new }}\".
       shell: bash
 
-    - name: Print users
-      run: echo ${{ github.workspace }} JAUJAU $GITHUB_WORKSPACE
+    - name: Allow root user to publish repository location.
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       shell: bash
-    - name: JAU
-      run: git config --global --add safe.directory /__w/clientnode/clientnode
-      shell: bash
-
 
     #- uses: EndBug/add-and-commit@v9
     #  with:
     #    tag: ${{ steps.version.outputs.new }}
     #    message: Publish new version "${{ steps.version.outputs.new }}".
 
-    #- name: Publish newly created package.
+    # Setup .npmrc file to publish to npm
+    - uses: actions/setup-node@v4
+      with:
+        node-version: latest
+        registry-url: 'https://registry.npmjs.org'
+    - name: Publish newly created package.
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
+      run: npm publish
+      shell: bash
+
+    #- uses: actions/setup-node@v4
+    #  with:
+    #    node-version: '20.x'
+    #    registry-url: 'https://npm.pkg.github.com'
+    #    # Defaults to the user or organization that owns the workflow file
+    #    scope: '@octocat'
+    #- run: npm publish
     #  env:
-    #    NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-    #  run: yarn publish
-    #  shell: bash
+    #    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
