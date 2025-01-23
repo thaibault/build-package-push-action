@@ -44,14 +44,17 @@ runs:
         >> "$GITHUB_OUTPUT"
       shell: bash
 
-    - name: print
+    - name: Print determined version.
       run: echo Newly determined version is \"${{ steps.version.outputs.new }}\".
       shell: bash
 
-    #- uses: EndBug/add-and-commit@v9
-    #  with:
-    #    default_author: github_actions
-    #    tag: ${{ steps.version.outputs.new }}
+    - name: Add workspace to git's trusted directories.
+      run: git config --global --add safe.directory '${{ github.workspace }}'
+      shell: bash
+
+    - uses: EndBug/add-and-commit@v9
+      with:
+        tag: ${{ steps.version.outputs.new }}
 
     #- name: Publish newly created package.
     #  env:
