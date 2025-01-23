@@ -44,17 +44,22 @@ runs:
         >> "$GITHUB_OUTPUT"
       shell: bash
 
-    - name: Print determined version.
+    - name: Remove downloaded artefacts.
+      run: rm --force --recursive .git/build-package-and-push-action
+      shell: bash
+
+    - name: Print determined new version.
       run: echo Newly determined version is \"${{ steps.version.outputs.new }}\".
       shell: bash
 
-    - name: Add workspace to git's trusted directories.
-      run: git config --global --add safe.directory .
+    - name: Analyze dir.
+      run: ls -lha
       shell: bash
 
     - uses: EndBug/add-and-commit@v9
       with:
         tag: ${{ steps.version.outputs.new }}
+        message: Publish new version \"${{ steps.version.outputs.new }}\".
 
     #- name: Publish newly created package.
     #  env:
