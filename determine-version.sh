@@ -39,7 +39,7 @@ while true; do
             break
             ;;
         *)
-            echo "Given argument: \"${1}\" is not available."
+            echo "Given argument: \"${1}\" is not available." &>/dev/stderr
             exit 1
     esac
 done
