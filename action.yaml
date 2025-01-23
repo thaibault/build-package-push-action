@@ -64,7 +64,9 @@ runs:
     - name: Print users
       run: cat /etc/passwd
       shell: bash
-
+    - name: JAU
+      run: git config --global --add safe.directory /__w/clientnode/clientnode
+      shell: bash
 
 
     - uses: EndBug/add-and-commit@v9
