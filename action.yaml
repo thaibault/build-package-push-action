@@ -59,10 +59,7 @@ runs:
       run: echo $USER
       shell: bash
     - name: Print
-      run: echo $HOME
-      shell: bash
-    - name: Print
-      run: cd && pwd
+      run: cd && pwd && ls -lha
       shell: bash
     - name: Print users
       run: cat /etc/passwd
