@@ -42,7 +42,7 @@ runs:
       shell: bash
 
     - name: print
-      run: echo '${{steps.version.new}}'
+      run: echo Steps output: '${{steps.version.new}}'
       shell: bash
 
     #- name: Create git tag for newly create package version.
