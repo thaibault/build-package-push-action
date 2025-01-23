@@ -15,9 +15,14 @@ declare -r VERSION_PATTERN='^([^.]+)\.([^.]+)\.([^.]+)(.+)?$'
 
 declare FORMAT='${MAJOR}.${MINOR}.${PATCH}${CANDIDATE}'
 declare UPDATE_TYPE=patch
+declare DEBUG=false
 
 while true; do
     case "$1" in
+        -d|--debug)
+            DEBUG=true
+            shift
+            ;;
         -f|--format)
             shift
             FORMAT="$1"
@@ -62,14 +67,16 @@ declare CANDIDATE="$(
     echo "$GIVEN_VERSION" | sed --regexp-extended "s/${VERSION_PATTERN}/\4/"
 )"
 
-echo GIVEN_VERSION: "$GIVEN_VERSION"
+if $DEBUG; then
+    echo GIVEN_VERSION: "$GIVEN_VERSION"
 
-echo MAJOR: "$MAJOR"
-echo MINOR: "$MINOR"
-echo PATCH: "$PATCH"
-echo CANDIDATE: "$CANDIDATE"
+    echo MAJOR: "$MAJOR"
+    echo MINOR: "$MINOR"
+    echo PATCH: "$PATCH"
+    echo CANDIDATE: "$CANDIDATE"
 
-echo TYPE: "$UPDATE_TYPE"
+    echo TYPE: "$UPDATE_TYPE"
+fi
 
 if [ "$UPDATE_TYPE" = major ]; then
     (( MAJOR += 1))
