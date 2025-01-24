@@ -87,3 +87,4 @@ runs:
     - run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ inputs.github-token }}
+      shell: bash
