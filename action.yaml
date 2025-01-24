@@ -78,13 +78,13 @@ runs:
       run: npm publish
       shell: bash
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: latest
-        registry-url: 'https://npm.pkg.github.com'
-        # Defaults to the user or organization that owns the workflow file.
-        scope: '@octocat'
-    - run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ inputs.github-token }}
-      shell: bash
+    #- uses: actions/setup-node@v4
+    #  with:
+    #    node-version: latest
+    #    registry-url: 'https://npm.pkg.github.com'
+    #    # Defaults to the user or organization that owns the workflow file.
+    #    scope: '@octocat'
+    #- run: npm publish
+    #  env:
+    #    NODE_AUTH_TOKEN: ${{ inputs.github-token }}
+    #  shell: bash
