@@ -66,7 +66,7 @@ runs:
         tag: ${{ steps.version.outputs.new }}
         message: Publish new version "${{ steps.version.outputs.new }}".
 
-    # Setup .npmrc file to publish to npm
+    # Setup .npmrc file to publish to npm.
     - uses: actions/setup-node@v4
       with:
         node-version: latest
@@ -78,6 +78,7 @@ runs:
       run: npm publish
       shell: bash
 
+    # Setup .npmrc file to publish to github.
     #- uses: actions/setup-node@v4
     #  with:
     #    node-version: latest
