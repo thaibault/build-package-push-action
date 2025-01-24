@@ -5,8 +5,11 @@ inputs:
     description: Sets "NODE_ENV" to "debug".
     required: false
     default: false
+  github-token:
+    description: Authentication token for github.
+    required: true
   npm-token:
-    description: List of build-time variables.
+    description: Authentication token for npm.
     required: true
 
   type:
@@ -83,4 +86,4 @@ runs:
         scope: '@octocat'
     - run: npm publish
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ inputs.github-token }}
