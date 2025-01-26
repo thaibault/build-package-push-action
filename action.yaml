@@ -34,7 +34,7 @@ runs:
       id: prepare-release
       with:
         debug: ${{ inputs.debug }}
-        debug: ${{ inputs.type || 'patch' }}
+        type: ${{ inputs.type || 'patch' }}
 
     # Setup .npmrc file to publish to npm.
     - uses: actions/setup-node@v4
