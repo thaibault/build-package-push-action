@@ -46,7 +46,7 @@ runs:
       env:
         NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
         NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-      run: npm publish
+      run: npm publish --tag candidate
       shell: bash
 
     # Setup .npmrc file to publish to github.
@@ -56,7 +56,7 @@ runs:
     #    registry-url: 'https://npm.pkg.github.com'
     #    # Defaults to the user or organization that owns the workflow file.
     #    scope: '@octocat'
-    #- run: npm publish
+    #- run: npm publish --tag candidate
     #  env:
     #    NODE_AUTH_TOKEN: ${{ inputs.github-token }}
     #  shell: bash
