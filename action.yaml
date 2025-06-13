@@ -34,7 +34,7 @@ runs:
       id: prepare-release
       with:
         debug: ${{ inputs.debug }}
-        type: ${{ inputs.type || 'patch' }}
+        type: ${{ inputs.type || 'patch' }}
 
     # Setup .npmrc file to publish to npm.
     - uses: actions/setup-node@v4
@@ -44,7 +44,7 @@ runs:
     - name: Publish newly created package.
       env:
         NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
-        NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
+        NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
       run: npm publish
       shell: bash
 
