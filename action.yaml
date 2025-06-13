@@ -20,6 +20,7 @@ inputs:
       - major
       - minor
       - patch
+      - candidate
 
 outputs:
   version:
