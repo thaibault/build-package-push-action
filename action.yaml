@@ -42,11 +42,11 @@ runs:
       with:
         node-version: latest
         registry-url: 'https://registry.npmjs.org'
-    - name: Publish newly created package.
+    - name: Publish newly created package to npm registry.
       env:
         NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
         NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-      run: npm publish --tag candidate
+      run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
       shell: bash
 
     # Setup .npmrc file to publish to github.
@@ -56,7 +56,9 @@ runs:
     #    registry-url: 'https://npm.pkg.github.com'
     #    # Defaults to the user or organization that owns the workflow file.
     #    scope: '@octocat'
-    #- run: npm publish --tag candidate
+    #- name: Publish newly created package to github registry.
     #  env:
-    #    NODE_AUTH_TOKEN: ${{ inputs.github-token }}
+    #    NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
+    #    NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
+    #  run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
     #  shell: bash
