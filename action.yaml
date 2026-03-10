@@ -44,7 +44,8 @@ runs:
         registry-url: 'https://registry.npmjs.org'
     - name: Publish newly created package to npm registry.
       env:
-        NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
+        # Not needed anymore when using "Trusted Publishing".
+        #NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
         NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
       run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
       shell: bash
