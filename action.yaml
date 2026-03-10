@@ -10,7 +10,7 @@ inputs:
     required: true
   npm-token:
     description: Authentication token for npm.
-    required: true
+    required: false
 
   type:
     description: Sets semantic version update type.
