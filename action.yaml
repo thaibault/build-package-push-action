@@ -51,7 +51,7 @@ runs:
       shell: bash
 
     # Setup .npmrc file to publish to github.
-    #- uses: actions/setup-node@v4
+    #- uses: actions/setup-node@v6
     #  with:
     #    node-version: latest
     #    registry-url: 'https://npm.pkg.github.com'
@@ -59,7 +59,8 @@ runs:
     #    scope: '@octocat'
     #- name: Publish newly created package to github registry.
     #  env:
-    #    NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
+    #    # Not needed anymore when using "Trusted Publishing".
+    #    #NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
     #    NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
     #  run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
     #  shell: bash
