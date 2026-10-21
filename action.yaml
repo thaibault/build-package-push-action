@@ -5,6 +5,13 @@ inputs:
     description: Sets "NODE_ENV" to "debug".
     required: false
     default: false
+  github-token:
+    description: Authentication token for github.
+    required: true
+  npm-token:
+    description: Authentication token for npm.
+    required: false
+
   type:
     description: Sets semantic version update type.
     default: patch
@@ -13,30 +20,47 @@ inputs:
       - major
       - minor
       - patch
+      - candidate
+
+outputs:
+  version:
+    description: The version of the newly published package.
+    value: ${{ steps.prepare-release.outputs.version }}
 
 runs:
   using: composite
 
   steps:
-    - uses: thaibault/install-npm-package-dependencies-action@main
-       with:
-         debug: ${{ inputs.debug }}
+    - uses: thaibault/prepare-release-action@main
+      id: prepare-release
+      with:
+        debug: ${{ inputs.debug }}
+        type: ${{ inputs.type || 'patch' }}
 
-    - name: Update package.json mentioned version.
-        env:
-          NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-        run: yarn version ${{ inputs.type || 'patch' }}
-        shell: bash
+    # Setup .npmrc file to publish to npm.
+    - uses: actions/setup-node@v7
+      with:
+        node-version: latest
+        registry-url: 'https://registry.npmjs.org'
+    - name: Publish newly created package to npm registry.
+      env:
+        # Not needed anymore when using "Trusted Publishing".
+        #NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
+        NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
+      run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
+      shell: bash
 
-      - name: Create git tag for newly create package version.
-        run: ls -lha && git tag "v$(node --eval 'console.log(require("./package.json").version)')"
-        shell: bash
-
-      - name: Update artefacts in git repository.
-        run: git commit --all --message 'Publish new version.' && git push --tags && git push
-        shell: bash
-
-      - name: Publish newly created package.
-        env:
-          NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
-        run: yarn publish
+    # Setup .npmrc file to publish to github.
+    #- uses: actions/setup-node@v6
+    #  with:
+    #    node-version: latest
+    #    registry-url: 'https://npm.pkg.github.com'
+    #    # Defaults to the user or organization that owns the workflow file.
+    #    scope: '@octocat'
+    #- name: Publish newly created package to github registry.
+    #  env:
+    #    # Not needed anymore when using "Trusted Publishing".
+    #    #NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
+    #    NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
+    #  run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
+    #  shell: bash
