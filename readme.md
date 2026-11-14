@@ -96,7 +96,6 @@ jobs:
         id: build-package-and-push
         with:
           debug: ${{ inputs.debug || '' }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           aur-ssh-private-key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           type: ${{ inputs.type || 'patch' }}
 
@@ -121,7 +120,6 @@ Inputs
 
 - "type": "major", "minor", "patch" (default) or "candidate". A candidate keeps the version and appends "-&lt;number&gt;", see [Release candidates](#release-candidates).<!--deDE:"type": "major", "minor", "patch" (Standard) oder "candidate". Ein Kandidat behält die Version und hängt "-&lt;number&gt;" an, siehe [Release-Kandidaten](#release-candidates).--><!--frFR:"type": "major", "minor", "patch" (par défaut) ou "candidate". Une version candidate garde la version et ajoute "-&lt;number&gt;", voir [Versions candidates](#release-candidates).-->
 - "debug": "true" sets "NODE_ENV" to "debug" while installing dependencies and publishing to npm. Default "false".<!--deDE:"debug": "true" setzt "NODE_ENV" beim Installieren der Abhängigkeiten und beim Veröffentlichen auf npm auf "debug". Standard "false".--><!--frFR:"debug": "true" met "NODE_ENV" à "debug" lors de l'installation des dépendances et de la publication sur npm. Par défaut "false".-->
-- "github-token" (required): token for GitHub. Currently not used, the repository is checked out and pushed with the token of the workflow.<!--deDE:"github-token" (erforderlich): Token für GitHub. Derzeit nicht verwendet, das Repository wird mit dem Token des Workflows ausgecheckt und gepusht.--><!--frFR:"github-token" (obligatoire): jeton pour GitHub. Actuellement inutilisé, le dépôt est récupéré et poussé avec le jeton du workflow.-->
 - "npm-token": token for npm. Not used anymore since "Trusted Publishing" is used.<!--deDE:"npm-token": Token für npm. Wird nicht mehr verwendet, da "Trusted Publishing" genutzt wird.--><!--frFR:"npm-token": jeton pour npm. N'est plus utilisé puisque "Trusted Publishing" est employé.-->
 - "aur-ssh-private-key": private SSH key registered in the AUR account. Without it nothing is published to the AUR.<!--deDE:"aur-ssh-private-key": im AUR-Konto registrierter privater SSH-Schlüssel. Ohne ihn wird nichts im AUR veröffentlicht.--><!--frFR:"aur-ssh-private-key": clé SSH privée enregistrée dans le compte AUR. Sans elle, rien n'est publié dans l'AUR.-->
 - "aur-commit-name": author name of AUR commits. Defaults to the actor triggering the workflow.<!--deDE:"aur-commit-name": Autorenname der AUR-Commits. Standardmäßig der Akteur, der den Workflow auslöst.--><!--frFR:"aur-commit-name": nom d'auteur des commits AUR. Par défaut, l'acteur qui déclenche le workflow.-->

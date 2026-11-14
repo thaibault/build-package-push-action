@@ -5,9 +5,6 @@ inputs:
     description: Sets "NODE_ENV" to "debug".
     required: false
     default: false
-  github-token:
-    description: Authentication token for github.
-    required: true
   npm-token:
     description: Authentication token for npm.
     required: false
