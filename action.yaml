@@ -12,6 +12,22 @@ inputs:
     description: Authentication token for npm.
     required: false
 
+  aur-ssh-private-key:
+    description: |
+      Private ssh key registered in arch's user repository. Needed to publish
+      an existing "PKGBUILD".
+    required: false
+  aur-commit-name:
+    description: |
+      Author name for commits pushed to arch's user repository. Defaults to
+      the actor triggering the workflow.
+    required: false
+  aur-commit-email:
+    description: |
+      Author email address for commits pushed to arch's user repository.
+      Defaults to the actor's no-reply github address.
+    required: false
+
   type:
     description: Sets semantic version update type.
     default: patch
@@ -37,12 +53,15 @@ runs:
         debug: ${{ inputs.debug }}
         type: ${{ inputs.type || 'patch' }}
 
+    # region npm
     # Setup .npmrc file to publish to npm.
-    - uses: actions/setup-node@v7
+    - if: steps.prepare-release.outputs.has-package-json == 'true'
+      uses: actions/setup-node@v7
       with:
         node-version: latest
         registry-url: 'https://registry.npmjs.org'
-    - name: Publish newly created package to npm registry.
+    - if: steps.prepare-release.outputs.has-package-json == 'true'
+      name: Publish newly created package to npm registry.
       env:
         # Not needed anymore when using "Trusted Publishing".
         #NODE_AUTH_TOKEN: ${{ inputs.npm-token }}
@@ -64,3 +83,81 @@ runs:
     #    NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
     #  run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
     #  shell: bash
+    # endregion
+
+    # region arch user repository
+    - if: |
+        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
+        !inputs.aur-ssh-private-key &&
+        !contains(inputs.type, 'candidate')
+      name: Skip publishing to arch's user repository without credentials.
+      run: echo '::warning::No "aur-ssh-private-key" given, so "PKGBUILD" is not published to arch'"'"'s user repository.'
+      shell: bash
+
+    - if: |
+        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
+        contains(inputs.type, 'candidate')
+      name: Skip publishing candidates to arch's user repository.
+      run: echo '::warning::Arch'"'"'s user repository does not support release candidates, so "PKGBUILD" is not published.'
+      shell: bash
+
+    # NOTE: Candidate versions can not be represented as "pkgver".
+    - if: |
+        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
+        inputs.aur-ssh-private-key &&
+        !contains(inputs.type, 'candidate')
+      name: Prepare publishing to arch's user repository.
+      env:
+        AUR_COMMIT_EMAIL: ${{ inputs.aur-commit-email || format('{0}@users.noreply.github.com', github.actor) }}
+        AUR_COMMIT_NAME: ${{ inputs.aur-commit-name || github.actor }}
+        AUR_SSH_PRIVATE_KEY: ${{ inputs.aur-ssh-private-key }}
+        DEBUG: ${{ contains(inputs.debug, 'true') }}
+        VERSION: ${{ steps.prepare-release.outputs.version }}
+      # NOTE: "github.action_path" points to the host in container jobs. Only
+      # the workspace is mounted into the docker step below, so everything
+      # needed is placed in the (untracked) ".git" folder.
+      run: |
+        mkdir --parents .git/build-package-push-action
+        cp \
+            "${GITHUB_ACTION_PATH}/deploy-to-aur.sh" \
+            .git/build-package-push-action/
+        (
+            umask 077
+            printf '%s\n' "$AUR_SSH_PRIVATE_KEY" \
+                > .git/build-package-push-action/aur-ssh-key
+        )
+        {
+            echo "AUR_COMMIT_EMAIL=${AUR_COMMIT_EMAIL@Q}"
+            message="Publish new version \"${VERSION}\"."
+            echo "AUR_COMMIT_MESSAGE=${message@Q}"
+            echo "AUR_COMMIT_NAME=${AUR_COMMIT_NAME@Q}"
+            echo "DEBUG=${DEBUG@Q}"
+        } > .git/build-package-push-action/environment.sh
+      shell: bash
+
+    - if: |
+        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
+        inputs.aur-ssh-private-key &&
+        !contains(inputs.type, 'candidate')
+      name: Publish PKGBUILD to arch's user repository.
+      uses: docker://archlinux:base-devel
+      with:
+        entrypoint: bash
+        args: .git/build-package-push-action/deploy-to-aur.sh
+
+    - if: always()
+      name: Remove credentials and deployment artifacts.
+      run: rm --force --recursive .git/build-package-push-action
+      shell: bash
+
+    # NOTE: Checksums of published sources (e.g. the npm package) are only
+    # known after publishing.
+    - if: |
+        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
+        inputs.aur-ssh-private-key &&
+        !contains(inputs.type, 'candidate')
+      uses: EndBug/add-and-commit@v11
+      with:
+        add: PKGBUILD
+        message: Update "PKGBUILD" checksums for version "${{ steps.prepare-release.outputs.version }}".
+    # endregion
