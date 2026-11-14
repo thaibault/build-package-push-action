@@ -101,61 +101,80 @@ runs:
       run: echo '::warning::Arch'"'"'s user repository does not support release candidates, so "PKGBUILD" is not published.'
       shell: bash
 
-    # NOTE: Candidate versions can not be represented as "pkgver".
+    # NOTE: Candidate versions can not be represented as "pkgver". All
+    # following steps only run if this step provides a package name.
     - if: |
         steps.prepare-release.outputs.has-pkgbuild == 'true' &&
         inputs.aur-ssh-private-key &&
         !contains(inputs.type, 'candidate')
-      name: Prepare publishing to arch's user repository.
-      env:
-        AUR_COMMIT_EMAIL: ${{ inputs.aur-commit-email || format('{0}@users.noreply.github.com', github.actor) }}
-        AUR_COMMIT_NAME: ${{ inputs.aur-commit-name || github.actor }}
-        AUR_SSH_PRIVATE_KEY: ${{ inputs.aur-ssh-private-key }}
-        DEBUG: ${{ contains(inputs.debug, 'true') }}
-        VERSION: ${{ steps.prepare-release.outputs.version }}
-      # NOTE: "github.action_path" points to the host in container jobs. Only
-      # the workspace is mounted into the docker step below, so everything
-      # needed is placed in the (untracked) ".git" folder.
+      name: Determine arch package name and local sources.
+      id: aur
+      # NOTE: "makepkg" expects local sources by their file name next to the
+      # "PKGBUILD" (e.g. "service/a.service" as "a.service") which matches how
+      # assets are copied.
       run: |
-        mkdir --parents .git/build-package-push-action
-        cp \
-            "${GITHUB_ACTION_PATH}/deploy-to-aur.sh" \
-            .git/build-package-push-action/
         (
-            umask 077
-            printf '%s\n' "$AUR_SSH_PRIVATE_KEY" \
-                > .git/build-package-push-action/aur-ssh-key
+            source ./PKGBUILD
+            echo "name=${pkgbase:-$pkgname}"
+            echo 'assets<<EOF'
+            for file_path in \
+                "${source[@]}" "${install:-}" "${changelog:-}"
+            do
+                file_path="${file_path#*::}"
+                [[ "$file_path" != '' && "$file_path" != *://* ]] && \
+                    echo "$file_path"
+            done
+            echo EOF
+        ) >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    # NOTE: Newly published sources (e.g. the npm package or the github tag
+    # archive) may need some time to become available.
+    - if: steps.aur.outputs.name
+      name: Wait until arch package sources are available.
+      run: |
+        (
+            source ./PKGBUILD
+            for url in "${source[@]}"; do
+                url="${url#*::}"
+                [[ "$url" == *://* ]] || \
+                    continue
+                for try in {1..40}; do
+                    curl \
+                        --fail \
+                        --location \
+                        --output /dev/null \
+                        --silent \
+                        "$url" && \
+                            continue 2
+                    echo "Source \"${url}\" is not available yet (try ${try})."
+                    sleep 30
+                done
+                echo "::error::Source \"${url}\" did not become available."
+                exit 1
+            done
         )
-        {
-            echo "AUR_COMMIT_EMAIL=${AUR_COMMIT_EMAIL@Q}"
-            message="Publish new version \"${VERSION}\"."
-            echo "AUR_COMMIT_MESSAGE=${message@Q}"
-            echo "AUR_COMMIT_NAME=${AUR_COMMIT_NAME@Q}"
-            echo "DEBUG=${DEBUG@Q}"
-        } > .git/build-package-push-action/environment.sh
       shell: bash
 
-    - if: |
-        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
-        inputs.aur-ssh-private-key &&
-        !contains(inputs.type, 'candidate')
+    # NOTE: Pinned to a commit since it gets the ssh private key.
+    - if: steps.aur.outputs.name
       name: Publish PKGBUILD to arch's user repository.
-      uses: docker://archlinux:base-devel
+      uses: KSXGitHub/github-actions-deploy-aur@084b0d9b15415bf9cdb65d44dad1efe37a354050 # v4.2.0
       with:
-        entrypoint: bash
-        args: .git/build-package-push-action/deploy-to-aur.sh
-
-    - if: always()
-      name: Remove credentials and deployment artifacts.
-      run: rm --force --recursive .git/build-package-push-action
-      shell: bash
+        pkgname: ${{ steps.aur.outputs.name }}
+        pkgbuild: PKGBUILD
+        assets: ${{ steps.aur.outputs.assets }}
+        updpkgsums: true
+        # NOTE: Brings updated checksums back to the workspace.
+        post_process: sudo cp PKGBUILD /github/workspace/PKGBUILD
+        commit_username: ${{ inputs.aur-commit-name || github.actor }}
+        commit_email: ${{ inputs.aur-commit-email || format('{0}@users.noreply.github.com', github.actor) }}
+        commit_message: Publish new version "${{ steps.prepare-release.outputs.version }}".
+        ssh_private_key: ${{ inputs.aur-ssh-private-key }}
 
     # NOTE: Checksums of published sources (e.g. the npm package) are only
     # known after publishing.
-    - if: |
-        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
-        inputs.aur-ssh-private-key &&
-        !contains(inputs.type, 'candidate')
+    - if: steps.aur.outputs.name
       uses: EndBug/add-and-commit@v11
       with:
         add: PKGBUILD
