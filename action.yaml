@@ -211,10 +211,18 @@ runs:
     - if: steps.aur.outputs.name
       name: Publish PKGBUILD to arch's user repository.
       uses: KSXGitHub/github-actions-deploy-aur@084b0d9b15415bf9cdb65d44dad1efe37a354050 # v4.2.0
+      # NOTE: Keeps downloaded sources, build files and built packages out of
+      # the published repository since all its files are committed.
+      env:
+        BUILDDIR: /tmp/makepkg/build
+        PKGDEST: /tmp/makepkg/packages
+        SRCDEST: /tmp/makepkg/sources
       with:
         pkgname: ${{ steps.aur.outputs.name }}
         asset_dir: .arch-user-repository
         updpkgsums: true
+        # NOTE: Builds the package without installing its dependencies.
+        test: true
         # NOTE: Brings updated checksums back to the workspace.
         post_process: sudo cp PKGBUILD /github/workspace/.arch-user-repository/PKGBUILD
         commit_username: ${{ inputs.aur-commit-name || github.actor }}
