@@ -50,6 +50,42 @@ runs:
         debug: ${{ inputs.debug }}
         type: ${{ inputs.type || 'patch' }}
 
+    # NOTE: Candidate versions can not be represented as "pkgver". All
+    # following arch user repository steps only run if this step provides a
+    # package name. Runs before anything is published to stop releases with
+    # unpublishable local sources early.
+    - if: |
+        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
+        inputs.aur-ssh-private-key &&
+        !contains(inputs.type, 'candidate')
+      name: Determine arch package name and local sources.
+      id: aur
+      # NOTE: "makepkg" expects local sources by their file name next to the
+      # "PKGBUILD" while arch's user repository expects them at their given
+      # path, so they can not be located in a sub directory.
+      run: |
+        output="$(
+            source ./PKGBUILD
+            echo "name=${pkgbase:-$pkgname}"
+            echo 'assets<<EOF'
+            for file_path in \
+                "${source[@]}" "${install:-}" "${changelog:-}"
+            do
+                file_path="${file_path#*::}"
+                [[ "$file_path" == '' || "$file_path" == *://* ]] && \
+                    continue
+                if [[ "$file_path" == */* ]]; then
+                    echo "::error::Local source \"${file_path}\" has to be located next to \"PKGBUILD\" to be published to arch's user repository." \
+                        1>&2
+                    exit 1
+                fi
+                echo "$file_path"
+            done
+            echo EOF
+        )"
+        echo "$output" >> "$GITHUB_OUTPUT"
+      shell: bash
+
     # region npm
     # Setup .npmrc file to publish to npm.
     - if: steps.prepare-release.outputs.has-package-json == 'true'
@@ -96,33 +132,6 @@ runs:
         contains(inputs.type, 'candidate')
       name: Skip publishing candidates to arch's user repository.
       run: echo '::warning::Arch'"'"'s user repository does not support release candidates, so "PKGBUILD" is not published.'
-      shell: bash
-
-    # NOTE: Candidate versions can not be represented as "pkgver". All
-    # following steps only run if this step provides a package name.
-    - if: |
-        steps.prepare-release.outputs.has-pkgbuild == 'true' &&
-        inputs.aur-ssh-private-key &&
-        !contains(inputs.type, 'candidate')
-      name: Determine arch package name and local sources.
-      id: aur
-      # NOTE: "makepkg" expects local sources by their file name next to the
-      # "PKGBUILD" (e.g. "service/a.service" as "a.service") which matches how
-      # assets are copied.
-      run: |
-        (
-            source ./PKGBUILD
-            echo "name=${pkgbase:-$pkgname}"
-            echo 'assets<<EOF'
-            for file_path in \
-                "${source[@]}" "${install:-}" "${changelog:-}"
-            do
-                file_path="${file_path#*::}"
-                [[ "$file_path" != '' && "$file_path" != *://* ]] && \
-                    echo "$file_path"
-            done
-            echo EOF
-        ) >> "$GITHUB_OUTPUT"
       shell: bash
 
     # NOTE: Newly published sources (e.g. the npm package or the github tag

@@ -193,6 +193,26 @@ each regular release is published to the AUR:
 3. Checksums are updated, a ".SRCINFO" is generated and both files are pushed together with all local sources, the "install" and the "changelog" file to the AUR package named after "pkgbase" or "pkgname". A package which does not exist yet is created.<!--deDE:Die Prüfsummen werden aktualisiert, eine ".SRCINFO" wird erzeugt und beide Dateien werden zusammen mit allen lokalen Quellen, der "install"- und der "changelog"-Datei in das nach "pkgbase" oder "pkgname" benannte AUR-Paket gepusht. Ein noch nicht existierendes Paket wird angelegt.--><!--frFR:Les sommes de contrôle sont mises à jour, un ".SRCINFO" est généré et les deux fichiers sont poussés avec toutes les sources locales, le fichier "install" et le fichier "changelog" vers le paquet AUR nommé d'après "pkgbase" ou "pkgname". Un paquet qui n'existe pas encore est créé.-->
 4. The updated checksums are committed back to the repository.<!--deDE:Die aktualisierten Prüfsummen werden ins Repository zurück committet.--><!--frFR:Les sommes de contrôle mises à jour sont committées dans le dépôt.-->
 
+Local sources, the "install" and the "changelog" file have to be located next
+to the "PKGBUILD": "makepkg" looks them up by their file name there while the
+AUR expects them at their given path. A local source in a sub directory (e.g.
+"service/a.service") fails the release before anything is published.
+<!--deDE:
+    Lokale Quellen, die "install"- und die "changelog"-Datei müssen neben dem
+    "PKGBUILD" liegen: "makepkg" sucht sie dort anhand ihres Dateinamens,
+    während das AUR sie unter ihrem angegebenen Pfad erwartet. Eine lokale
+    Quelle in einem Unterverzeichnis (z. B. "service/a.service") lässt die
+    Veröffentlichung fehlschlagen, bevor etwas veröffentlicht wird.
+-->
+<!--frFR:
+    Les sources locales, le fichier "install" et le fichier "changelog"
+    doivent se trouver à côté du "PKGBUILD" : "makepkg" les y cherche par
+    leur nom de fichier, tandis que l'AUR les attend à leur chemin indiqué.
+    Une source locale dans un sous-répertoire (par exemple
+    "service/a.service") fait échouer la publication avant que quoi que ce
+    soit ne soit publié.
+-->
+
 The AUR part is done by
 [KSXGitHub/github-actions-deploy-aur](https://github.com/KSXGitHub/github-actions-deploy-aur),
 pinned to a commit since it gets the private key.
