@@ -190,27 +190,40 @@ each regular release is published to the AUR:
 
 1. "pkgver" is set to the new version and "pkgrel" to "1". With a "package.json" its version is the source of truth, otherwise the current "pkgver" is incremented.<!--deDE:"pkgver" wird auf die neue Version und "pkgrel" auf "1" gesetzt. Mit einer "package.json" ist deren Version maßgeblich, sonst wird das aktuelle "pkgver" erhöht.--><!--frFR:"pkgver" est mis à la nouvelle version et "pkgrel" à "1". Avec un "package.json", sa version fait foi, sinon le "pkgver" actuel est incrémenté.-->
 2. The action waits up to 20 minutes until every remote source is downloadable, since a just published npm package or tag archive may need some time to become available.<!--deDE:Die Action wartet bis zu 20 Minuten, bis jede entfernte Quelle herunterladbar ist, da ein gerade veröffentlichtes npm-Paket oder Tag-Archiv etwas Zeit brauchen kann.--><!--frFR:L'action attend jusqu'à 20 minutes que chaque source distante soit téléchargeable, car un paquet npm ou une archive de tag tout juste publiés peuvent mettre un peu de temps à être disponibles.-->
-3. Checksums are updated, a ".SRCINFO" is generated and both files are pushed together with all local sources, the "install" and the "changelog" file to the AUR package named after "pkgbase" or "pkgname". A package which does not exist yet is created.<!--deDE:Die Prüfsummen werden aktualisiert, eine ".SRCINFO" wird erzeugt und beide Dateien werden zusammen mit allen lokalen Quellen, der "install"- und der "changelog"-Datei in das nach "pkgbase" oder "pkgname" benannte AUR-Paket gepusht. Ein noch nicht existierendes Paket wird angelegt.--><!--frFR:Les sommes de contrôle sont mises à jour, un ".SRCINFO" est généré et les deux fichiers sont poussés avec toutes les sources locales, le fichier "install" et le fichier "changelog" vers le paquet AUR nommé d'après "pkgbase" ou "pkgname". Un paquet qui n'existe pas encore est créé.-->
+3. Checksums are updated, a ".SRCINFO" is generated and both files are pushed together with all local sources, the "install" and the "changelog" file to the AUR package named after "pkgbase" or "pkgname". A package which does not exist yet is created, files which are not part of the package anymore are removed.<!--deDE:Die Prüfsummen werden aktualisiert, eine ".SRCINFO" wird erzeugt und beide Dateien werden zusammen mit allen lokalen Quellen, der "install"- und der "changelog"-Datei in das nach "pkgbase" oder "pkgname" benannte AUR-Paket gepusht. Ein noch nicht existierendes Paket wird angelegt, nicht mehr zum Paket gehörende Dateien werden entfernt.--><!--frFR:Les sommes de contrôle sont mises à jour, un ".SRCINFO" est généré et les deux fichiers sont poussés avec toutes les sources locales, le fichier "install" et le fichier "changelog" vers le paquet AUR nommé d'après "pkgbase" ou "pkgname". Un paquet qui n'existe pas encore est créé, les fichiers qui ne font plus partie du paquet sont supprimés.-->
 4. The updated checksums are committed back to the repository.<!--deDE:Die aktualisierten Prüfsummen werden ins Repository zurück committet.--><!--frFR:Les sommes de contrôle mises à jour sont committées dans le dépôt.-->
 
-Local sources, the "install" and the "changelog" file have to be located next
-to the "PKGBUILD": "makepkg" looks them up by their file name there while the
-AUR expects them at their given path. A local source in a sub directory (e.g.
-"service/a.service") fails the release before anything is published.
+Local sources, the "install" and the "changelog" file may be located in sub
+directories (e.g. "service/a.service"). They are published by their file name
+next to the "PKGBUILD", whose published copy references them accordingly
+(e.g. "a.service"), since "makepkg" looks them up there. So they have to be
+written literally in the "PKGBUILD", need distinct file names and are
+referenced by their file name in "package()" (e.g. "${srcdir}/a.service").
+Otherwise the release fails before anything is published. Only the updated
+checksums are committed back, the repository's "PKGBUILD" keeps its paths.
 <!--deDE:
-    Lokale Quellen, die "install"- und die "changelog"-Datei müssen neben dem
-    "PKGBUILD" liegen: "makepkg" sucht sie dort anhand ihres Dateinamens,
-    während das AUR sie unter ihrem angegebenen Pfad erwartet. Eine lokale
-    Quelle in einem Unterverzeichnis (z. B. "service/a.service") lässt die
-    Veröffentlichung fehlschlagen, bevor etwas veröffentlicht wird.
+    Lokale Quellen, die "install"- und die "changelog"-Datei dürfen in
+    Unterverzeichnissen liegen (z. B. "service/a.service"). Sie werden unter
+    ihrem Dateinamen neben dem "PKGBUILD" veröffentlicht, dessen
+    veröffentlichte Kopie sie entsprechend referenziert (z. B. "a.service"),
+    da "makepkg" sie dort sucht. Daher müssen sie im "PKGBUILD" wörtlich
+    angegeben sein, unterschiedliche Dateinamen haben und in "package()" über
+    ihren Dateinamen referenziert werden (z. B. "${srcdir}/a.service").
+    Andernfalls schlägt die Veröffentlichung fehl, bevor etwas veröffentlicht
+    wird. Nur die aktualisierten Prüfsummen werden zurück committet, das
+    "PKGBUILD" des Repositorys behält seine Pfade.
 -->
 <!--frFR:
     Les sources locales, le fichier "install" et le fichier "changelog"
-    doivent se trouver à côté du "PKGBUILD" : "makepkg" les y cherche par
-    leur nom de fichier, tandis que l'AUR les attend à leur chemin indiqué.
-    Une source locale dans un sous-répertoire (par exemple
-    "service/a.service") fait échouer la publication avant que quoi que ce
-    soit ne soit publié.
+    peuvent se trouver dans des sous-répertoires (par exemple
+    "service/a.service"). Elles sont publiées sous leur nom de fichier à côté
+    du "PKGBUILD", dont la copie publiée les référence en conséquence (par
+    exemple "a.service"), puisque "makepkg" les y cherche. Elles doivent donc
+    être écrites littéralement dans le "PKGBUILD", avoir des noms de fichier
+    distincts et être référencées par leur nom de fichier dans "package()"
+    (par exemple "${srcdir}/a.service"). Sinon, la publication échoue avant
+    que quoi que ce soit ne soit publié. Seules les sommes de contrôle mises
+    à jour sont committées, le "PKGBUILD" du dépôt garde ses chemins.
 -->
 
 The AUR part is done by
