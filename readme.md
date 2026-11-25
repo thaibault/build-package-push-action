@@ -83,7 +83,8 @@ on:
 permissions:
   # Required for "Trusted Publishing" to npm.
   id-token: write
-  # Required to push the release commit and tag.
+  # Required to push the release commit and tag and to create the github
+  # release.
   contents: write
 
 jobs:
@@ -111,7 +112,8 @@ A release runs through the following steps:
 1. [prepare-release-action](https://github.com/thaibault/prepare-release-action) checks out the repository, installs the dependencies if a "package.json" exists and determines the new version from "package.json", "PKGBUILD" or the existing tags.<!--deDE:[prepare-release-action](https://github.com/thaibault/prepare-release-action) checkt das Repository aus, installiert die Abhängigkeiten, falls eine "package.json" existiert, und ermittelt die neue Version aus "package.json", "PKGBUILD" oder den vorhandenen Tags.--><!--frFR:[prepare-release-action](https://github.com/thaibault/prepare-release-action) récupère le dépôt, installe les dépendances si un "package.json" existe et détermine la nouvelle version à partir de "package.json", "PKGBUILD" ou des tags existants.-->
 2. The changed manifest files are committed as "Publish new version "v&lt;version&gt;"." and tagged as "v&lt;version&gt;".<!--deDE:Die geänderten Manifest-Dateien werden als "Publish new version "v&lt;version&gt;"." committet und als "v&lt;version&gt;" getaggt.--><!--frFR:Les fichiers manifestes modifiés sont committés sous "Publish new version "v&lt;version&gt;"." et tagués "v&lt;version&gt;".-->
 3. With a "package.json" the package is published to the npm registry, see [npm registry](#npm-registry).<!--deDE:Mit einer "package.json" wird das Paket in der npm-Registry veröffentlicht, siehe [npm-Registry](#npm-registry).--><!--frFR:Avec un "package.json", le paquet est publié dans le registre npm, voir [Registre npm](#npm-registry).-->
-4. With a "PKGBUILD" the package is published to the AUR, see [Arch user repository](#arch-user-repository).<!--deDE:Mit einem "PKGBUILD" wird das Paket im AUR veröffentlicht, siehe [Arch User Repository](#arch-user-repository).--><!--frFR:Avec un "PKGBUILD", le paquet est publié dans l'AUR, voir [Arch User Repository](#arch-user-repository).-->
+4. A github release is created for the new tag, see [Github release](#github-release).<!--deDE:Für den neuen Tag wird ein GitHub-Release erstellt, siehe [GitHub-Release](#github-release).--><!--frFR:Une release github est créée pour le nouveau tag, voir [Release github](#github-release).-->
+5. With a "PKGBUILD" the package is published to the AUR, see [Arch user repository](#arch-user-repository).<!--deDE:Mit einem "PKGBUILD" wird das Paket im AUR veröffentlicht, siehe [Arch User Repository](#arch-user-repository).--><!--frFR:Avec un "PKGBUILD", le paquet est publié dans l'AUR, voir [Arch User Repository](#arch-user-repository).-->
 
 <!--|deDE:Eingaben-->
 <!--|frFR:Entrées-->
@@ -120,6 +122,7 @@ Inputs
 
 - "type": "major", "minor", "patch" (default) or "candidate". A candidate keeps the version and appends "-&lt;number&gt;", see [Release candidates](#release-candidates).<!--deDE:"type": "major", "minor", "patch" (Standard) oder "candidate". Ein Kandidat behält die Version und hängt "-&lt;number&gt;" an, siehe [Release-Kandidaten](#release-candidates).--><!--frFR:"type": "major", "minor", "patch" (par défaut) ou "candidate". Une version candidate garde la version et ajoute "-&lt;number&gt;", voir [Versions candidates](#release-candidates).-->
 - "debug": "true" sets "NODE_ENV" to "debug" while installing dependencies and publishing to npm. Default "false".<!--deDE:"debug": "true" setzt "NODE_ENV" beim Installieren der Abhängigkeiten und beim Veröffentlichen auf npm auf "debug". Standard "false".--><!--frFR:"debug": "true" met "NODE_ENV" à "debug" lors de l'installation des dépendances et de la publication sur npm. Par défaut "false".-->
+- "github-release": "false" skips creating a github release. Default "true".<!--deDE:"github-release": "false" überspringt das Erstellen eines GitHub-Releases. Standard "true".--><!--frFR:"github-release": "false" ignore la création d'une release github. Par défaut "true".-->
 - "npm-token": token for npm. Not used anymore since "Trusted Publishing" is used.<!--deDE:"npm-token": Token für npm. Wird nicht mehr verwendet, da "Trusted Publishing" genutzt wird.--><!--frFR:"npm-token": jeton pour npm. N'est plus utilisé puisque "Trusted Publishing" est employé.-->
 - "aur-ssh-private-key": private SSH key registered in the AUR account. Without it nothing is published to the AUR.<!--deDE:"aur-ssh-private-key": im AUR-Konto registrierter privater SSH-Schlüssel. Ohne ihn wird nichts im AUR veröffentlicht.--><!--frFR:"aur-ssh-private-key": clé SSH privée enregistrée dans le compte AUR. Sans elle, rien n'est publié dans l'AUR.-->
 - "aur-commit-name": author name of AUR commits. Defaults to the actor triggering the workflow.<!--deDE:"aur-commit-name": Autorenname der AUR-Commits. Standardmäßig der Akteur, der den Workflow auslöst.--><!--frFR:"aur-commit-name": nom d'auteur des commits AUR. Par défaut, l'acteur qui déclenche le workflow.-->
@@ -170,6 +173,36 @@ settings on npmjs.com and grant the workflow "id-token: write".
     enregistrez le dépôt et le fichier de workflow comme éditeur de confiance
     dans les paramètres du paquet sur npmjs.com et accordez au workflow
     "id-token: write".
+-->
+
+<!--|deDE:GitHub-Release-->
+<!--|frFR:Release github-->
+Github release
+--------------
+
+Unless "github-release" is "false", each version gets a github release named
+after its tag with generated release notes. With a "package.json" the
+published npm package is attached as "&lt;name&gt;-&lt;version&gt;.tgz", so
+it can be downloaded including its build output, which the tag's source
+archive lacks. Release candidates are marked as pre-release and do not become
+the latest release. The workflow needs "contents: write".
+<!--deDE:
+    Sofern "github-release" nicht "false" ist, erhält jede Version ein nach
+    ihrem Tag benanntes GitHub-Release mit generierten Release-Notes. Mit einer
+    "package.json" wird das veröffentlichte npm-Paket als
+    "&lt;name&gt;-&lt;version&gt;.tgz" angehängt, sodass es inklusive seiner
+    Build-Ausgabe heruntergeladen werden kann, die dem Quellarchiv des Tags
+    fehlt. Release-Kandidaten werden als Pre-Release markiert und werden nicht
+    zum neuesten Release. Der Workflow benötigt "contents: write".
+-->
+<!--frFR:
+    Sauf si "github-release" vaut "false", chaque version reçoit une release
+    github nommée d'après son tag avec des notes de version générées. Avec un
+    "package.json", le paquet npm publié est joint sous
+    "&lt;name&gt;-&lt;version&gt;.tgz", de sorte qu'il peut être téléchargé
+    avec sa sortie de build, absente de l'archive source du tag. Les versions
+    candidates sont marquées comme pré-release et ne deviennent pas la
+    dernière release. Le workflow a besoin de "contents: write".
 -->
 
 <!--|deDE:Arch User Repository-->

@@ -9,6 +9,14 @@ inputs:
     description: Authentication token for npm.
     required: false
 
+  github-release:
+    description: |
+      Creates a github release for the new version's tag. With a
+      "package.json" the published npm package is attached as asset. Needs
+      "contents: write" permission.
+    required: false
+    default: true
+
   aur-ssh-private-key:
     description: |
       Private ssh key registered in arch's user repository. Needed to publish
@@ -152,6 +160,38 @@ runs:
     #    NODE_ENV: ${{ contains(inputs.debug, 'true') && 'debug' || '' }}
     #  run: npm publish --tag ${{ contains(inputs.type, 'candidate') && 'candidate' || 'latest' }}
     #  shell: bash
+    # endregion
+
+    # region github release
+    # NOTE: "npm publish" already ran all lifecycle scripts (e.g. "prepare"),
+    # so packing again without them results in the published package content.
+    - if: |
+        contains(inputs.github-release, 'true') &&
+        steps.prepare-release.outputs.has-package-json == 'true'
+      name: Pack published npm package for the github release.
+      id: pack
+      env:
+        DIRECTORY_PATH: ${{ runner.temp }}/github-release
+      run: |
+        rm --force --recursive "$DIRECTORY_PATH"
+        mkdir "$DIRECTORY_PATH"
+        npm pack --ignore-scripts --pack-destination "$DIRECTORY_PATH" \
+            >/dev/null
+        echo "file-path=$(find "$DIRECTORY_PATH" -name '*.tgz' -print -quit)" \
+            >>"$GITHUB_OUTPUT"
+      shell: bash
+
+    - if: contains(inputs.github-release, 'true')
+      name: Create github release.
+      uses: softprops/action-gh-release@v3
+      with:
+        tag_name: ${{ steps.prepare-release.outputs.version }}
+        name: ${{ steps.prepare-release.outputs.version }}
+        prerelease: ${{ contains(inputs.type, 'candidate') }}
+        make_latest: ${{ !contains(inputs.type, 'candidate') }}
+        generate_release_notes: true
+        files: ${{ steps.pack.outputs.file-path }}
+        fail_on_unmatched_files: true
     # endregion
 
     # region arch user repository
